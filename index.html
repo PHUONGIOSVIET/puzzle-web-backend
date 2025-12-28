@@ -5,95 +5,116 @@
 <title>PLAYTOGETHER X IOSVIET</title>
 
 <style>
-/* ===== NỀN + HOA RƠI ===== */
+/* ===== BODY ===== */
 body{
   margin:0;
   font-family:Arial, sans-serif;
-  background:linear-gradient(#fdeff9,#ecf0ff);
-  overflow:hidden;
-}
-#flowers{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:0;
-}
-
-/* ===== CĂN GIỮA ===== */
-.wrapper{
+  background:#f3f4ff;
   min-height:100vh;
   display:flex;
   justify-content:center;
-  align-items:center;
-  position:relative;
-  z-index:1;
+  padding-top:40px;
 }
-.container{text-align:center}
 
-/* ===== TIÊU ĐỀ ===== */
-.title{
-  font-size:28px;
-  font-weight:bold;
-  letter-spacing:2px;
+/* ===== WRAPPER ===== */
+.wrapper{
+  background:#fff;
+  padding:22px 30px 30px;
+  border-radius:20px;
+  box-shadow:0 12px 30px rgba(0,0,0,.15);
 }
-.subtitle{
-  font-size:14px;
-  color:#666;
+
+/* ===== TITLE ===== */
+.title{
+  text-align:center;
+  font-size:22px;
+  font-weight:bold;
   margin-bottom:14px;
 }
-
-/* ===== APP ===== */
-.app{
-  background:#fff;
-  padding:28px 40px 34px;
-  border-radius:18px;
-  box-shadow:0 20px 45px rgba(0,0,0,.18);
+.subtitle{
+  text-align:center;
+  font-size:13px;
+  color:#666;
+  margin-bottom:18px;
 }
 
 /* ===== CONTROLS ===== */
 .controls{
-  margin-bottom:14px;
+  text-align:center;
+  margin-bottom:18px;
 }
 .controls input{
-  width:60px;
-  font-size:16px;
+  width:50px;
   padding:4px;
   margin:0 6px;
 }
-button{
-  padding:8px 18px;
+.controls button{
+  padding:6px 14px;
   border:none;
   border-radius:8px;
+  background:#eee;
   cursor:pointer;
-  background:#f0f0f0;
 }
-button:hover{background:#e0e0e0}
+.controls button:hover{background:#ddd}
 
 /* ===== TOOLBAR ===== */
 .toolbar{
   display:flex;
+  gap:14px;
+  padding:16px 18px;
+  border-radius:18px;
+  background:#fff;
+  box-shadow:0 10px 25px rgba(0,0,0,.12);
   justify-content:center;
-  gap:12px;
-  margin:18px 0;
+  margin-bottom:22px;
 }
-.tool{
+
+.tool-wrap{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  cursor:pointer;
+  user-select:none;
+}
+
+.tool-label{
+  font-size:12px;
+  font-weight:600;
+  margin-bottom:6px;
+}
+
+.tool-box{
   width:52px;
   height:52px;
-  border:2px solid #ddd;
-  border-radius:12px;
+  border-radius:14px;
   display:flex;
   align-items:center;
   justify-content:center;
-  cursor:pointer;
   font-size:26px;
-  background:#fff;
-  transition:.2s;
+  color:#fff;
+  box-shadow:0 4px 10px rgba(0,0,0,.3);
 }
-.tool.active{
-  border-color:#ff4d4f;
-  background:#ffecec;
-  transform:scale(1.12);
+
+.tool-wrap.active .tool-box{
+  outline:3px solid #ff5252;
 }
+
+.tool-index{
+  margin-top:6px;
+  font-size:11px;
+  font-weight:bold;
+}
+
+/* ===== COLORS ===== */
+.neo{background:#ff4fd8}
+.thuyen{background:#7b3fe4}
+.tiec{background:#ff3b30}
+.ngoc{background:#63c132}
+.nhac{background:#ffcc00}
+.cohoi{background:linear-gradient(135deg,#ff7ac8,#ffd36a)}
+.xu{background:#5cc6ff}
+.goiy{background:#4dd0e1}
+.loi{background:#ff9800}
 
 /* ===== GRID ===== */
 .grid{
@@ -102,145 +123,139 @@ button:hover{background:#e0e0e0}
   justify-content:center;
 }
 .cell{
-  width:82px;
-  height:82px;
-  border:2px solid #aaa;
-  border-radius:12px;
+  width:64px;
+  height:64px;
+  border:2px solid #bbb;
+  border-radius:10px;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:36px;
+  font-size:26px;
   cursor:pointer;
   background:#fff;
-  user-select:none;
-}
-.cell.pop{
-  animation:pop .25s ease;
-}
-@keyframes pop{
-  from{transform:scale(.6);opacity:.3}
-  to{transform:scale(1);opacity:1}
 }
 </style>
 </head>
 
 <body>
 
-<canvas id="flowers"></canvas>
-
 <div class="wrapper">
-  <div class="container">
 
-    <div class="title">PLAYTOGETHER X IOSVIET</div>
-    <div class="subtitle">(bấm 1 lần: đặt / xóa)</div>
+  <div class="title">PLAYTOGETHER X IOSVIET</div>
+  <div class="subtitle">(bấm 1 lần: đặt / xóa)</div>
 
-    <div class="app">
-      <div class="controls">
-        Cao <input id="rows" type="number" value="3" min="1">
-        Dài <input id="cols" type="number" value="7" min="1">
-        <button onclick="createGrid()">Tạo Lưới</button>
-        <button onclick="resetGrid()">Reset</button>
-      </div>
+  <!-- CONTROLS -->
+  <div class="controls">
+    Cao <input id="rows" type="number" value="3" min="1">
+    Dài <input id="cols" type="number" value="7" min="1">
+    <button onclick="createGrid()">Tạo Lưới</button>
+    <button onclick="resetGrid()">Reset</button>
+  </div>
 
-      <div class="toolbar" id="toolbar"></div>
-      <div class="grid" id="grid"></div>
+  <!-- TOOLBAR -->
+  <div class="toolbar" id="toolbar">
+
+    <div class="tool-wrap active" data-icon="⚓">
+      <div class="tool-label">Neo</div>
+      <div class="tool-box neo">⚓</div>
+      <div class="tool-index">1</div>
+    </div>
+
+    <div class="tool-wrap" data-icon="⛵">
+      <div class="tool-label">Thuyền</div>
+      <div class="tool-box thuyen">⛵</div>
+      <div class="tool-index">2</div>
+    </div>
+
+    <div class="tool-wrap" data-icon="🍷">
+      <div class="tool-label">Tiệc</div>
+      <div class="tool-box tiec">🍷</div>
+      <div class="tool-index">3</div>
+    </div>
+
+    <div class="tool-wrap" data-icon="♦">
+      <div class="tool-label">Ngọc</div>
+      <div class="tool-box ngoc">♦</div>
+      <div class="tool-index">4</div>
+    </div>
+
+    <div class="tool-wrap" data-icon="🎵">
+      <div class="tool-label">Nhạc</div>
+      <div class="tool-box nhac">🎵</div>
+      <div class="tool-index">5</div>
+    </div>
+
+    <div class="tool-wrap" data-icon="✨">
+      <div class="tool-label">Cơ hội</div>
+      <div class="tool-box cohoi">✨</div>
+      <div class="tool-index">6</div>
+    </div>
+
+    <div class="tool-wrap" data-icon="🎟️">
+      <div class="tool-label">Xu</div>
+      <div class="tool-box xu">🎟️</div>
+      <div class="tool-index">7</div>
+    </div>
+
+    <div class="tool-wrap" data-icon="🔍">
+      <div class="tool-label">Gợi ý</div>
+      <div class="tool-box goiy">🔍</div>
+      <div class="tool-index">8</div>
+    </div>
+
+    <div class="tool-wrap" data-icon="⚙️">
+      <div class="tool-label">Lỗi</div>
+      <div class="tool-box loi">⚙️</div>
+      <div class="tool-index">9</div>
     </div>
 
   </div>
+
+  <!-- GRID -->
+  <div class="grid" id="grid"></div>
+
 </div>
 
 <script>
-/* ===== ICONS (ĐẦY ĐỦ) ===== */
-const icons = ["🍷","🎵","🟪","⛵","🔶","⚓","🪄","🔍","🎂"];
-let currentIcon = icons[0];
+let currentIcon = "⚓";
 let gridData = [];
 
-const toolbar = document.getElementById("toolbar");
-const grid = document.getElementById("grid");
-
-/* ===== TOOLBAR ===== */
-icons.forEach(icon=>{
-  const t=document.createElement("div");
-  t.className="tool"+(icon===currentIcon?" active":"");
-  t.textContent=icon;
-  t.onclick=()=>{
-    document.querySelectorAll(".tool").forEach(x=>x.classList.remove("active"));
+/* TOOLBAR CLICK */
+document.querySelectorAll(".tool-wrap").forEach(t=>{
+  t.onclick = ()=>{
+    document.querySelectorAll(".tool-wrap").forEach(x=>x.classList.remove("active"));
     t.classList.add("active");
-    currentIcon=icon;
+    currentIcon = t.dataset.icon;
   };
-  toolbar.appendChild(t);
 });
 
-/* ===== GRID ===== */
+/* GRID */
 function createGrid(){
-  const r=+rows.value, c=+cols.value;
-  gridData=Array(r*c).fill("");
-  grid.style.gridTemplateColumns=`repeat(${c},82px)`;
+  const r = +rows.value;
+  const c = +cols.value;
+  gridData = Array(r*c).fill("");
+  grid.style.gridTemplateColumns = `repeat(${c},64px)`;
   render();
 }
 
 function render(){
-  grid.innerHTML="";
+  grid.innerHTML = "";
   gridData.forEach((v,i)=>{
-    const cell=document.createElement("div");
-    cell.className="cell";
-    cell.textContent=v;
-
-    // ✅ 1 CLICK: toggle đặt / xóa
-    cell.onclick=()=>{
-      if(gridData[i]===""){
-        gridData[i]=currentIcon;
-        cell.classList.add("pop");
-        setTimeout(()=>cell.classList.remove("pop"),200);
-      }else{
-        gridData[i]="";
-      }
+    const cell = document.createElement("div");
+    cell.className = "cell";
+    cell.textContent = v;
+    cell.onclick = ()=>{
+      gridData[i] = gridData[i]==="" ? currentIcon : "";
       render();
     };
-
     grid.appendChild(cell);
   });
 }
 
 function resetGrid(){
-  grid.innerHTML="";
-  gridData=[];
+  grid.innerHTML = "";
+  gridData = [];
 }
-
-/* ===== HOA RƠI ===== */
-const canvas=document.getElementById("flowers");
-const ctx=canvas.getContext("2d");
-
-function resize(){
-  canvas.width=innerWidth;
-  canvas.height=innerHeight;
-}
-resize();
-addEventListener("resize",resize);
-
-const petals=Array.from({length:45},()=>({
-  x:Math.random()*canvas.width,
-  y:Math.random()*canvas.height,
-  r:Math.random()*6+4,
-  s:Math.random()*1.2+.5
-}));
-
-function fall(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  petals.forEach(p=>{
-    p.y+=p.s;
-    p.x+=Math.sin(p.y*0.01);
-    if(p.y>canvas.height){
-      p.y=-10; p.x=Math.random()*canvas.width;
-    }
-    ctx.beginPath();
-    ctx.fillStyle="rgba(255,182,193,.85)";
-    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-    ctx.fill();
-  });
-  requestAnimationFrame(fall);
-}
-fall();
 </script>
 
 </body>
