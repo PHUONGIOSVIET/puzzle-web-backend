@@ -2,10 +2,10 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>Puzzle Demo</title>
+<title>PLAYTOGETHER X IOSVIET</title>
 
 <style>
-/* ================= NỀN + HOA RƠI ================= */
+/* ===== NỀN + HOA RƠI ===== */
 body{
   margin:0;
   font-family:Arial, sans-serif;
@@ -19,7 +19,7 @@ body{
   z-index:0;
 }
 
-/* ================= CĂN GIỮA ================= */
+/* ===== CĂN GIỮA ===== */
 .wrapper{
   min-height:100vh;
   display:flex;
@@ -29,18 +29,35 @@ body{
   z-index:1;
 }
 
-/* ================= APP ================= */
+/* ===== KHỐI CHỨA ===== */
+.container{
+  text-align:center;
+}
+
+/* ===== TIÊU ĐỀ ===== */
+.title{
+  font-size:28px;
+  font-weight:bold;
+  letter-spacing:2px;
+  margin-bottom:4px;
+}
+.subtitle{
+  font-size:14px;
+  color:#666;
+  margin-bottom:14px;
+}
+
+/* ===== APP ===== */
 .app{
   background:#fff;
-  padding:30px 40px;
-  border-radius:16px;
+  padding:28px 40px 34px;
+  border-radius:18px;
   box-shadow:0 20px 45px rgba(0,0,0,.18);
 }
 
-/* ================= CONTROLS ================= */
+/* ===== CONTROLS ===== */
 .controls{
-  text-align:center;
-  margin-bottom:16px;
+  margin-bottom:14px;
 }
 .controls input{
   width:60px;
@@ -57,7 +74,7 @@ button{
 }
 button:hover{background:#e0e0e0}
 
-/* ================= TOOLBAR ================= */
+/* ===== TOOLBAR ===== */
 .toolbar{
   display:flex;
   justify-content:center;
@@ -77,14 +94,13 @@ button:hover{background:#e0e0e0}
   background:#fff;
   transition:.2s;
 }
-.tool:hover{transform:scale(1.05)}
 .tool.active{
   border-color:#ff4d4f;
   background:#ffecec;
   transform:scale(1.12);
 }
 
-/* ================= GRID ================= */
+/* ===== GRID ===== */
 .grid{
   display:grid;
   gap:10px;
@@ -101,13 +117,9 @@ button:hover{background:#e0e0e0}
   font-size:36px;
   cursor:pointer;
   background:#fff;
+  user-select:none;
   transition:.15s;
 }
-.cell:active{
-  transform:scale(.9);
-}
-
-/* hiệu ứng pop */
 .cell.pop{
   animation:pop .25s ease;
 }
@@ -123,96 +135,100 @@ button:hover{background:#e0e0e0}
 <canvas id="flowers"></canvas>
 
 <div class="wrapper">
-  <div class="app">
+  <div class="container">
 
-    <div class="controls">
-      Cao <input id="rows" type="number" value="3" min="1">
-      Dài <input id="cols" type="number" value="7" min="1">
-      <button onclick="createGrid()">Tạo Lưới</button>
-      <button onclick="resetGrid()">Reset</button>
+    <!-- ===== CHỮ PHÍA TRÊN ===== -->
+    <div class="title">PLAYTOGETHER X IOSVIET</div>
+    <div class="subtitle">(bấm 2 lần để xóa)</div>
+
+    <div class="app">
+
+      <div class="controls">
+        Cao <input id="rows" type="number" value="3" min="1">
+        Dài <input id="cols" type="number" value="7" min="1">
+        <button onclick="createGrid()">Tạo Lưới</button>
+        <button onclick="resetGrid()">Reset</button>
+      </div>
+
+      <div class="toolbar" id="toolbar"></div>
+      <div class="grid" id="grid"></div>
+
     </div>
-
-    <div class="toolbar" id="toolbar"></div>
-    <div class="grid" id="grid"></div>
-
   </div>
 </div>
 
 <script>
-/* ================= ICONS (ĐẦY ĐỦ THEO HÌNH) ================= */
-const icons = [
-  "🍷", // ly rượu
-  "🎵", // nhạc
-  "🟪", // hoa văn / xoáy
-  "⛵", // thuyền buồm
-  "🔶", // kim cương đỏ
-  "⚓", // mỏ neo
-  "🪄", // đũa phép
-  "🔍", // kính lúp
-  "🎂"  // bánh kem
-];
-
+/* ===== ICONS ===== */
+const icons = ["🍷","🎵","🟪","⛵","🔶","⚓","🪄","🔍","🎂"];
 let currentIcon = icons[0];
 let gridData = [];
 
 const toolbar = document.getElementById("toolbar");
 const grid = document.getElementById("grid");
 
-/* ================= TOOLBAR ================= */
+/* ===== TOOLBAR ===== */
 icons.forEach(icon=>{
-  const t = document.createElement("div");
-  t.className = "tool" + (icon===currentIcon ? " active":"");
-  t.textContent = icon;
-  t.onclick = ()=>{
+  const t=document.createElement("div");
+  t.className="tool"+(icon===currentIcon?" active":"");
+  t.textContent=icon;
+  t.onclick=()=>{
     document.querySelectorAll(".tool").forEach(x=>x.classList.remove("active"));
     t.classList.add("active");
-    currentIcon = icon;
+    currentIcon=icon;
   };
   toolbar.appendChild(t);
 });
 
-/* ================= GRID ================= */
+/* ===== GRID ===== */
 function createGrid(){
-  const r = +rows.value;
-  const c = +cols.value;
-  gridData = Array(r*c).fill("");
-  grid.style.gridTemplateColumns = `repeat(${c},82px)`;
+  const r=+rows.value, c=+cols.value;
+  gridData=Array(r*c).fill("");
+  grid.style.gridTemplateColumns=`repeat(${c},82px)`;
   render();
 }
 
 function render(){
-  grid.innerHTML = "";
+  grid.innerHTML="";
   gridData.forEach((v,i)=>{
-    const cell = document.createElement("div");
-    cell.className = "cell";
-    cell.textContent = v;
-    cell.onclick = ()=>{
-      gridData[i] = gridData[i] === "" ? currentIcon : "";
-      cell.classList.add("pop");
-      setTimeout(()=>cell.classList.remove("pop"),200);
+    const cell=document.createElement("div");
+    cell.className="cell";
+    cell.textContent=v;
+
+    // CLICK 1 LẦN: ĐẶT ICON
+    cell.onclick=()=>{
+      if(gridData[i]===""){
+        gridData[i]=currentIcon;
+        cell.classList.add("pop");
+        setTimeout(()=>cell.classList.remove("pop"),200);
+        render();
+      }
+    };
+
+    // DOUBLE CLICK: XÓA ICON
+    cell.ondblclick=()=>{
+      gridData[i]="";
       render();
     };
+
     grid.appendChild(cell);
   });
 }
 
 function resetGrid(){
-  grid.innerHTML = "";
-  gridData = [];
+  grid.innerHTML="";
+  gridData=[];
 }
 
-/* ================= HOA RƠI ================= */
-const canvas = document.getElementById("flowers");
-const ctx = canvas.getContext("2d");
-
+/* ===== HOA RƠI ===== */
+const canvas=document.getElementById("flowers");
+const ctx=canvas.getContext("2d");
 function resize(){
-  canvas.width = innerWidth;
-  canvas.height = innerHeight;
+  canvas.width=innerWidth;
+  canvas.height=innerHeight;
 }
-resize();
-addEventListener("resize",resize);
+resize(); addEventListener("resize",resize);
 
-const petals = Array.from({length:45},()=>({
+const petals=Array.from({length:45},()=>({
   x:Math.random()*canvas.width,
   y:Math.random()*canvas.height,
   r:Math.random()*6+4,
@@ -222,11 +238,10 @@ const petals = Array.from({length:45},()=>({
 function fall(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
   petals.forEach(p=>{
-    p.y += p.s;
-    p.x += Math.sin(p.y*0.01);
-    if(p.y > canvas.height){
-      p.y = -10;
-      p.x = Math.random()*canvas.width;
+    p.y+=p.s;
+    p.x+=Math.sin(p.y*0.01);
+    if(p.y>canvas.height){
+      p.y=-10; p.x=Math.random()*canvas.width;
     }
     ctx.beginPath();
     ctx.fillStyle="rgba(255,182,193,.85)";
