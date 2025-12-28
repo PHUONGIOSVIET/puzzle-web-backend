@@ -3,70 +3,72 @@
 <head>
 <meta charset="UTF-8">
 <title>Puzzle Demo</title>
+
 <style>
-/* ===== NỀN + HOA RƠI ===== */
+/* ================= NỀN + HOA RƠI ================= */
 body{
   margin:0;
-  font-family:Arial;
+  font-family:Arial, sans-serif;
   background:linear-gradient(#fdeff9,#ecf0ff);
   overflow:hidden;
 }
-
-/* canvas hoa */
 #flowers{
   position:fixed;
-  top:0;left:0;
-  width:100vw;height:100vh;
+  inset:0;
   pointer-events:none;
   z-index:0;
 }
 
-/* ===== CĂN GIỮA ===== */
+/* ================= CĂN GIỮA ================= */
 .wrapper{
-  position:relative;
-  z-index:1;
   min-height:100vh;
   display:flex;
   justify-content:center;
   align-items:center;
+  position:relative;
+  z-index:1;
 }
 
-/* ===== APP ===== */
+/* ================= APP ================= */
 .app{
-  background:white;
+  background:#fff;
   padding:30px 40px;
-  border-radius:14px;
-  box-shadow:0 15px 40px rgba(0,0,0,.15);
+  border-radius:16px;
+  box-shadow:0 20px 45px rgba(0,0,0,.18);
 }
 
-/* ===== CONTROLS ===== */
+/* ================= CONTROLS ================= */
 .controls{
   text-align:center;
-  margin-bottom:15px;
+  margin-bottom:16px;
 }
 .controls input{
   width:60px;
   font-size:16px;
+  padding:4px;
+  margin:0 6px;
 }
 button{
-  padding:8px 16px;
-  margin-left:6px;
+  padding:8px 18px;
   border:none;
-  border-radius:6px;
+  border-radius:8px;
   cursor:pointer;
+  background:#f0f0f0;
 }
+button:hover{background:#e0e0e0}
 
-/* ===== TOOLBAR ===== */
+/* ================= TOOLBAR ================= */
 .toolbar{
   display:flex;
   justify-content:center;
   gap:12px;
-  margin:20px 0;
+  margin:18px 0;
 }
 .tool{
-  width:50px;height:50px;
+  width:52px;
+  height:52px;
   border:2px solid #ddd;
-  border-radius:10px;
+  border-radius:12px;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -75,21 +77,24 @@ button{
   background:#fff;
   transition:.2s;
 }
+.tool:hover{transform:scale(1.05)}
 .tool.active{
   border-color:#ff4d4f;
-  transform:scale(1.1);
+  background:#ffecec;
+  transform:scale(1.12);
 }
 
-/* ===== GRID ===== */
+/* ================= GRID ================= */
 .grid{
   display:grid;
   gap:10px;
   justify-content:center;
 }
 .cell{
-  width:80px;height:80px;
+  width:82px;
+  height:82px;
   border:2px solid #aaa;
-  border-radius:10px;
+  border-radius:12px;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -99,16 +104,16 @@ button{
   transition:.15s;
 }
 .cell:active{
-  transform:scale(0.9);
+  transform:scale(.9);
 }
 
-/* hiệu ứng click */
+/* hiệu ứng pop */
 .cell.pop{
   animation:pop .25s ease;
 }
 @keyframes pop{
-  0%{transform:scale(.7);opacity:.3}
-  100%{transform:scale(1);opacity:1}
+  from{transform:scale(.6);opacity:.3}
+  to{transform:scale(1);opacity:1}
 }
 </style>
 </head>
@@ -118,57 +123,71 @@ button{
 <canvas id="flowers"></canvas>
 
 <div class="wrapper">
-<div class="app">
+  <div class="app">
 
-  <div class="controls">
-    Cao <input id="rows" type="number" value="3">
-    Dài <input id="cols" type="number" value="7">
-    <button onclick="createGrid()">Tạo Lưới</button>
-    <button onclick="resetGrid()">Reset</button>
+    <div class="controls">
+      Cao <input id="rows" type="number" value="3" min="1">
+      Dài <input id="cols" type="number" value="7" min="1">
+      <button onclick="createGrid()">Tạo Lưới</button>
+      <button onclick="resetGrid()">Reset</button>
+    </div>
+
+    <div class="toolbar" id="toolbar"></div>
+    <div class="grid" id="grid"></div>
+
   </div>
-
-  <div class="toolbar" id="toolbar"></div>
-  <div class="grid" id="grid"></div>
-
-</div>
 </div>
 
 <script>
-/* ===== GAME ===== */
-const icons=["🍷","🎵","💎","⚓","🔍"];
-let currentIcon=icons[0];
-let gridData=[];
+/* ================= ICONS (ĐẦY ĐỦ THEO HÌNH) ================= */
+const icons = [
+  "🍷", // ly rượu
+  "🎵", // nhạc
+  "🟪", // hoa văn / xoáy
+  "⛵", // thuyền buồm
+  "🔶", // kim cương đỏ
+  "⚓", // mỏ neo
+  "🪄", // đũa phép
+  "🔍", // kính lúp
+  "🎂"  // bánh kem
+];
 
-const toolbar=document.getElementById("toolbar");
-const grid=document.getElementById("grid");
+let currentIcon = icons[0];
+let gridData = [];
 
+const toolbar = document.getElementById("toolbar");
+const grid = document.getElementById("grid");
+
+/* ================= TOOLBAR ================= */
 icons.forEach(icon=>{
-  const t=document.createElement("div");
-  t.className="tool"+(icon===currentIcon?" active":"");
-  t.innerText=icon;
-  t.onclick=()=>{
+  const t = document.createElement("div");
+  t.className = "tool" + (icon===currentIcon ? " active":"");
+  t.textContent = icon;
+  t.onclick = ()=>{
     document.querySelectorAll(".tool").forEach(x=>x.classList.remove("active"));
     t.classList.add("active");
-    currentIcon=icon;
+    currentIcon = icon;
   };
   toolbar.appendChild(t);
 });
 
+/* ================= GRID ================= */
 function createGrid(){
-  const r=+rows.value,c=+cols.value;
-  gridData=Array(r*c).fill("");
-  grid.style.gridTemplateColumns=`repeat(${c},80px)`;
+  const r = +rows.value;
+  const c = +cols.value;
+  gridData = Array(r*c).fill("");
+  grid.style.gridTemplateColumns = `repeat(${c},82px)`;
   render();
 }
 
 function render(){
-  grid.innerHTML="";
+  grid.innerHTML = "";
   gridData.forEach((v,i)=>{
-    const cell=document.createElement("div");
-    cell.className="cell";
-    cell.innerText=v;
-    cell.onclick=()=>{
-      gridData[i]=gridData[i]===""?currentIcon:"";
+    const cell = document.createElement("div");
+    cell.className = "cell";
+    cell.textContent = v;
+    cell.onclick = ()=>{
+      gridData[i] = gridData[i] === "" ? currentIcon : "";
       cell.classList.add("pop");
       setTimeout(()=>cell.classList.remove("pop"),200);
       render();
@@ -178,34 +197,39 @@ function render(){
 }
 
 function resetGrid(){
-  grid.innerHTML="";
-  gridData=[];
+  grid.innerHTML = "";
+  gridData = [];
 }
 
-/* ===== HOA RƠI ===== */
-const canvas=document.getElementById("flowers");
-const ctx=canvas.getContext("2d");
-canvas.width=innerWidth;
-canvas.height=innerHeight;
+/* ================= HOA RƠI ================= */
+const canvas = document.getElementById("flowers");
+const ctx = canvas.getContext("2d");
 
-let petals=[];
-for(let i=0;i<40;i++){
-  petals.push({
-    x:Math.random()*canvas.width,
-    y:Math.random()*canvas.height,
-    r:Math.random()*6+4,
-    s:Math.random()*1+0.5
-  });
+function resize(){
+  canvas.width = innerWidth;
+  canvas.height = innerHeight;
 }
+resize();
+addEventListener("resize",resize);
+
+const petals = Array.from({length:45},()=>({
+  x:Math.random()*canvas.width,
+  y:Math.random()*canvas.height,
+  r:Math.random()*6+4,
+  s:Math.random()*1.2+.5
+}));
 
 function fall(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
   petals.forEach(p=>{
-    p.y+=p.s;
-    p.x+=Math.sin(p.y*0.01);
-    if(p.y>canvas.height) p.y=-10;
+    p.y += p.s;
+    p.x += Math.sin(p.y*0.01);
+    if(p.y > canvas.height){
+      p.y = -10;
+      p.x = Math.random()*canvas.width;
+    }
     ctx.beginPath();
-    ctx.fillStyle="rgba(255,182,193,.8)";
+    ctx.fillStyle="rgba(255,182,193,.85)";
     ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
     ctx.fill();
   });
