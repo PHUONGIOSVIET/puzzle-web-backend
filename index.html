@@ -28,18 +28,13 @@ body{
   position:relative;
   z-index:1;
 }
-
-/* ===== KHỐI CHỨA ===== */
-.container{
-  text-align:center;
-}
+.container{text-align:center}
 
 /* ===== TIÊU ĐỀ ===== */
 .title{
   font-size:28px;
   font-weight:bold;
   letter-spacing:2px;
-  margin-bottom:4px;
 }
 .subtitle{
   font-size:14px;
@@ -118,7 +113,6 @@ button:hover{background:#e0e0e0}
   cursor:pointer;
   background:#fff;
   user-select:none;
-  transition:.15s;
 }
 .cell.pop{
   animation:pop .25s ease;
@@ -137,12 +131,10 @@ button:hover{background:#e0e0e0}
 <div class="wrapper">
   <div class="container">
 
-    <!-- ===== CHỮ PHÍA TRÊN ===== -->
     <div class="title">PLAYTOGETHER X IOSVIET</div>
-    <div class="subtitle">(bấm 2 lần để xóa)</div>
+    <div class="subtitle">(bấm 1 lần: đặt / xóa)</div>
 
     <div class="app">
-
       <div class="controls">
         Cao <input id="rows" type="number" value="3" min="1">
         Dài <input id="cols" type="number" value="7" min="1">
@@ -152,13 +144,13 @@ button:hover{background:#e0e0e0}
 
       <div class="toolbar" id="toolbar"></div>
       <div class="grid" id="grid"></div>
-
     </div>
+
   </div>
 </div>
 
 <script>
-/* ===== ICONS ===== */
+/* ===== ICONS (ĐẦY ĐỦ) ===== */
 const icons = ["🍷","🎵","🟪","⛵","🔶","⚓","🪄","🔍","🎂"];
 let currentIcon = icons[0];
 let gridData = [];
@@ -194,19 +186,15 @@ function render(){
     cell.className="cell";
     cell.textContent=v;
 
-    // CLICK 1 LẦN: ĐẶT ICON
+    // ✅ 1 CLICK: toggle đặt / xóa
     cell.onclick=()=>{
       if(gridData[i]===""){
         gridData[i]=currentIcon;
         cell.classList.add("pop");
         setTimeout(()=>cell.classList.remove("pop"),200);
-        render();
+      }else{
+        gridData[i]="";
       }
-    };
-
-    // DOUBLE CLICK: XÓA ICON
-    cell.ondblclick=()=>{
-      gridData[i]="";
       render();
     };
 
@@ -222,11 +210,13 @@ function resetGrid(){
 /* ===== HOA RƠI ===== */
 const canvas=document.getElementById("flowers");
 const ctx=canvas.getContext("2d");
+
 function resize(){
   canvas.width=innerWidth;
   canvas.height=innerHeight;
 }
-resize(); addEventListener("resize",resize);
+resize();
+addEventListener("resize",resize);
 
 const petals=Array.from({length:45},()=>({
   x:Math.random()*canvas.width,
